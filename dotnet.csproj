@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="dotenv.net" Version="3.1.2" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Data" Version="13.0.5" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">

@@ -2,7 +2,10 @@ using dotnet;
 
 public class Query
 {
-    public List<Film> GetFilms([Service] AppDbContext db) =>
-        db.Films.ToList<Film>();
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    public IQueryable<Film> GetFilms(AppDbContext db) =>
+        db.Films;
 
 }

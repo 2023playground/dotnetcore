@@ -1,7 +1,7 @@
 using dotnet;
 
 public class Mutation {
-    public Film AddFilm([Service] AppDbContext db, string name, string summary) {
+    public Film AddFilm(AppDbContext db, string name, string summary) {
         var film = new Film {
             Name = name,
             Summary = summary
