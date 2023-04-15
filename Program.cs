@@ -1,18 +1,16 @@
-using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 
-DotEnv.Load();
+DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
-var envVars = DotEnv.Read();
 var port = "5000";
 try{
-    port = envVars["PORT"];
+    port = System.Environment.GetEnvironmentVariable("PORT");
 } catch (KeyNotFoundException){
     Console.WriteLine("PORT not found in .env file");
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(envVars["DB_HOST"]));
+    options.UseNpgsql(System.Environment.GetEnvironmentVariable("DB_HOST")));
 
 builder.Services
     .AddGraphQLServer()
