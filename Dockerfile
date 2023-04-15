@@ -8,9 +8,5 @@ RUN dotnet publish -c release -o /app
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app .
-
-RUN dotnet tool install --global dotnet-ef
-RUN dotnet ef database update
-
 ENTRYPOINT ["dotnet", "dotnet.dll"]
 

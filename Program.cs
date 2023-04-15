@@ -7,8 +7,7 @@ var envVars = DotEnv.Read();
 var port = "5000";
 try{
     port = envVars["PORT"];
-} catch (KeyNotFoundException)
-{
+} catch (KeyNotFoundException){
     Console.WriteLine("PORT not found in .env file");
 }
 
@@ -23,6 +22,16 @@ builder.Services
     .AddProjections().AddFiltering();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope()){
+    try{
+        scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+        Console.WriteLine("Migrations applied successfully.");
+    }
+    catch (Exception ex){
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+}
 
 app.MapGraphQL();
 
