@@ -2,10 +2,7 @@ using dotnet;
 
 public class Query
 {
-    public Film GetFilm() =>
-        new Film
-        {
-            Date = DateOnly.FromDateTime(DateTime.Now),
-            
-        };
+    public List<Film> GetFilms([Service] AppDbContext db) =>
+        db.Films.ToList<Film>();
+
 }
