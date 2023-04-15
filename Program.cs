@@ -4,6 +4,13 @@ using Microsoft.EntityFrameworkCore;
 DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 var envVars = DotEnv.Read();
+var port = "5000";
+try{
+    port = envVars["PORT"];
+} catch (KeyNotFoundException)
+{
+    Console.WriteLine("PORT not found in .env file");
+}
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(envVars["DB_HOST"]));
@@ -19,4 +26,4 @@ var app = builder.Build();
 
 app.MapGraphQL();
 
-app.Run();
+app.Run("http://0.0.0.0:"+port);
