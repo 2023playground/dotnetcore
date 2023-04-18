@@ -1,4 +1,4 @@
-public class UserMutation : Mutation
+public partial class Mutation
 {
     public User Register(
         AppDbContext db,

@@ -1,1 +1,1 @@
-public class Mutation { }
+public partial class Mutation { }
