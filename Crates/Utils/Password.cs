@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 
-public class PasswordUtils{
+public class PasswordUtils
+{
     public static string HashPassword(string password)
     {
         byte[] salt;
