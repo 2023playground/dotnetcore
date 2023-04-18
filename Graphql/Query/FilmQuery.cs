@@ -1,6 +1,4 @@
-using dotnet;
-
-public class Query
+public class FilmQuery:Query
 {
     [UsePaging]
     [UseProjection]
