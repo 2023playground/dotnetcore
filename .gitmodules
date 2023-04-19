@@ -1,0 +1,3 @@
+[submodule "Submodules/Protos"]
+	path = Submodules/Protos
+	url = https://github.com/2023playground/Protos.git
