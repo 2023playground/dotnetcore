@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using GrpcDataCollect.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
 
 DotNetEnv.Env.Load();
-var builder = WebApplication.CreateBuilder(args);
-string port = "5000";
+var port = "5000";
 try
 {
     port = System.Environment.GetEnvironmentVariable("PORT")!;
@@ -11,6 +13,33 @@ catch (KeyNotFoundException)
 {
     Console.WriteLine("PORT not found in .env file");
 }
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Listen(
+        IPAddress.Loopback,
+        int.Parse(port!),
+        listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http1;
+        }
+    );
+
+    options.Listen(
+        IPAddress.Loopback,
+        int.Parse(port!) + 1,
+        listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http2;
+        }
+    );
+});
+
+builder.WebHost.UseUrls($"http://localhost:{port}", $"http://localhost:{int.Parse(port!) + 1}");
+
+builder.Services.AddGrpc();
 
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(System.Environment.GetEnvironmentVariable("DB_HOST"))
@@ -43,4 +72,6 @@ using (var scope = app.Services.CreateScope())
 
 app.MapGraphQL();
 
-app.Run("http://0.0.0.0:" + port);
+app.MapGrpcService<FilmCollectService>();
+
+app.Run();

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcDataCollect";
+
+package dataCollect;
+
+// Send multiple movie detail
+service SendFilmDetails {
+  rpc FilmDetailsReq (FilmDetailList) returns (SendFilmDetailsRes);
+}
+
+message FilmDetailList {
+  repeated FilmDetail FilmDetails= 1;
+}
+
+// The request message containing Film name and info
+message FilmDetail {
+  int32 id = 1;
+  string FilmUrl = 2;
+  string FilmName = 3;
+  string MediaFileName = 4;
+  bool HasSessions = 5;
+}
+
+// The response message containing response
+message SendFilmDetailsRes {
+  string res = 1;
+}
