@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using GrpcGreeter.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Net;
 
 DotNetEnv.Env.Load();
-var builder = WebApplication.CreateBuilder(args);
 var port = "5000";
 try
 {
@@ -12,6 +13,31 @@ catch (KeyNotFoundException)
 {
     Console.WriteLine("PORT not found in .env file");
 }
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Listen(
+        IPAddress.Loopback,
+        int.Parse(port!),
+        listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http1;
+        }
+    );
+
+    options.Listen(
+        IPAddress.Loopback,
+        int.Parse(port!) + 1,
+        listenOptions =>
+        {
+            listenOptions.Protocols = HttpProtocols.Http2;
+        }
+    );
+});
+
+builder.WebHost.UseUrls($"http://localhost:{port}", $"http://localhost:{port + 1}");
 
 builder.Services.AddGrpc();
 
@@ -47,6 +73,5 @@ using (var scope = app.Services.CreateScope())
 app.MapGraphQL();
 
 app.MapGrpcService<GreeterService>();
-app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-app.Run("http://0.0.0.0:" + port);
+app.Run();
