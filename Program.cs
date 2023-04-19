@@ -37,7 +37,7 @@ builder.WebHost.ConfigureKestrel(options =>
     );
 });
 
-builder.WebHost.UseUrls($"http://localhost:{port}", $"http://localhost:{port + 1}");
+builder.WebHost.UseUrls($"http://localhost:{port}", $"http://localhost:{int.Parse(port!) + 1}");
 
 builder.Services.AddGrpc();
 
