@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
-var port = "5000";
+string port = "5000";
 try
 {
-    port = System.Environment.GetEnvironmentVariable("PORT");
+    port = System.Environment.GetEnvironmentVariable("PORT")!;
 }
 catch (KeyNotFoundException)
 {
