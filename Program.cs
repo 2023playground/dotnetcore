@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using GrpcGreeter.Services;
+using GrpcDataCollect.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
 
@@ -72,6 +72,6 @@ using (var scope = app.Services.CreateScope())
 
 app.MapGraphQL();
 
-app.MapGrpcService<GreeterService>();
+app.MapGrpcService<DataCollectService>();
 
 app.Run();
