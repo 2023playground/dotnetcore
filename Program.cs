@@ -73,5 +73,6 @@ using (var scope = app.Services.CreateScope())
 app.MapGraphQL();
 
 app.MapGrpcService<DataCollectService>();
+app.MapGrpcService<MovieCollectService>();
 
 app.Run();

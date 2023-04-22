@@ -12,9 +12,28 @@ public class DataCollectService : Greeteror.GreeterorBase
 
     public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
     {
+        Console.WriteLine(request);
+        Console.WriteLine(request.Name);
         return Task.FromResult(new HelloReply
         {
             Message = "Hello my amigo222" + request.Name
+        });
+    }
+}
+
+public class MovieCollectService : SendMovieDetails.SendMovieDetailsBase
+{
+    private readonly ILogger<MovieCollectService> _logger;
+    public MovieCollectService(ILogger<MovieCollectService> logger)
+    {
+        _logger = logger;
+    }
+    public override Task<SendMovieDetailsRes> MovieDetailsReq(MovieDetailList request, ServerCallContext context)
+    {
+        Console.WriteLine(request);
+        return Task.FromResult(new SendMovieDetailsRes
+        {
+            Res = "Hello my amigo222" + request
         });
     }
 }
