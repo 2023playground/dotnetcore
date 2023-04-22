@@ -1,3 +1,9 @@
+using HotChocolate.Execution;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+
 public partial class Mutation
 {
     public User Register(
@@ -5,23 +11,17 @@ public partial class Mutation
         string email,
         string firstName,
         string lastName,
-        string? auth0Id,
-        string? password
+        string password
     )
     {
         // hash password
-        string? hash = null;
-        if (password != null)
-        {
-            hash = PasswordUtils.HashPassword(password);
-        }
+        var hash = PasswordUtils.HashPassword(password);
 
         var user = new User
         {
             Email = email,
             FirstName = firstName,
             LastName = lastName,
-            Auth0Id = auth0Id,
             Password = hash
         };
         db.Users.Add(user);
@@ -47,25 +47,27 @@ public partial class Mutation
         var user = db.Users.FirstOrDefault(u => u.Email == email);
         if (user == null)
         {
-            throw new Exception("User not found");
+            throw new QueryException(ErrorBuilder.New().SetMessage("User not found").Build());
         }
         if (user.Password == null)
         {
-            throw new Exception("User does not have a password, please login via social login");
+            throw new QueryException(
+                ErrorBuilder
+                    .New()
+                    .SetMessage("User does not have a password, please login via social login")
+                    .Build()
+            );
         }
 
         //verify password
         if (PasswordUtils.VerifyPassword(password, user.Password) == false)
         {
-            throw new Exception("Password is incorrect");
+            throw new QueryException(
+                ErrorBuilder.New().SetMessage("Password is incorrect").Build()
+            );
         }
 
-        var session = new Session
-        {
-            UserId = user.Id,
-            ExpiryDate = DateTime.Now.AddDays(1),
-            Token = Guid.NewGuid().ToString()
-        };
+        var session = HashUtils.GetNewSession(user);
         db.Sessions.Add(session);
         db.SaveChanges();
         return session;
@@ -76,10 +78,75 @@ public partial class Mutation
         var session = db.Sessions.FirstOrDefault(s => s.Token == token);
         if (session == null)
         {
-            throw new Exception("Session not found");
+            throw new QueryException(ErrorBuilder.New().SetMessage("Session not found").Build());
         }
         db.Sessions.Remove(session);
         db.SaveChanges();
         return session;
+    }
+
+    public Session SocialLogin(AppDbContext db, string accessToken)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var auth0User = handler.ReadJwtToken(accessToken);
+
+        if (auth0User.Subject == null)
+        {
+            throw new QueryException(
+                ErrorBuilder.New().SetMessage("User not registered via social app:auth0").Build()
+            );
+        }
+
+        //get user
+        var user = db.Users.FirstOrDefault(u => u.Auth0Id == auth0User.Subject);
+
+        if (user == null)
+        {
+            //register user
+            var client = new RestClient(System.Environment.GetEnvironmentVariable("AUTH0_DOMAIN")!);
+            var request = new RestRequest("/userinfo", Method.Get);
+            request.AddHeader("Authorization", "Bearer " + accessToken);
+            var response = client.Execute(request);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var json = JObject.Parse(response.Content!);
+                if (json.ContainsKey("sub"))
+                {
+                    var auth0Id = json["sub"]!.ToString();
+                    var email = json["email"]?.ToString();
+                    var firstName = json["given_name"]?.ToString();
+                    var lastName = json["family_name"]?.ToString();
+
+                    var newUser = new User
+                    {
+                        Email = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Auth0Id = auth0Id
+                    };
+                    db.Users.Add(newUser);
+                    db.SaveChanges();
+
+                    //create a new session
+                    var session = HashUtils.GetNewSession(newUser);
+
+                    db.Sessions.Add(session);
+                    db.SaveChanges();
+                    return session;
+                }
+            }
+
+            throw new QueryException(
+                ErrorBuilder.New().SetMessage("Error getting user info from Auth0").Build()
+            );
+        }
+        else
+        {
+            //create a new session
+            var session = HashUtils.GetNewSession(user);
+            db.Sessions.Add(session);
+            db.SaveChanges();
+            return session;
+        }
     }
 }

@@ -4,17 +4,18 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
 
 DotNetEnv.Env.Load();
-var port = "5000";
+
+var builder = WebApplication.CreateBuilder(args);
+string port = "5000";
+
 try
 {
-    port = System.Environment.GetEnvironmentVariable("PORT");
+    port = System.Environment.GetEnvironmentVariable("PORT")!;
 }
 catch (KeyNotFoundException)
 {
     Console.WriteLine("PORT not found in .env file");
 }
-
-var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(options =>
 {
