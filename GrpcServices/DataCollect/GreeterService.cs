@@ -33,7 +33,7 @@ public class MovieCollectService : SendMovieDetails.SendMovieDetailsBase
         Console.WriteLine(request);
         return Task.FromResult(new SendMovieDetailsRes
         {
-            Res = "Hello my amigo222" + request
+            Res = "Movie details received, This is the first movie's name: " + request.MovieDetails[0]
         });
     }
 }
