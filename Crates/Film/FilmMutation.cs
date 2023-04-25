@@ -19,4 +19,16 @@ public partial class Mutation
         db.SaveChanges();
         return true;
     }
+
+    public bool DeleteAllFilms(AppDbContext db)
+    {
+        var films = db.Films.ToList();
+        if (films == null)
+        {
+            return false;
+        }
+        db.Films.RemoveRange(films);
+        db.SaveChanges();
+        return true;
+    }
 }
