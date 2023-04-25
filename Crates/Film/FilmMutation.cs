@@ -7,4 +7,16 @@ public partial class Mutation
         db.SaveChanges();
         return film;
     }
+
+    public bool DeleteFilmById(AppDbContext db, int filmId)
+    {
+        var film = db.Films.FirstOrDefault(f => f.FilmId == filmId);
+        if (film == null)
+        {
+            return false;
+        }
+        db.Films.Remove(film);
+        db.SaveChanges();
+        return true;
+    }
 }
