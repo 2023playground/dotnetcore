@@ -78,7 +78,7 @@ public class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
 
         return Task.FromResult(new SendFilmDetailsRes
         {
-            Res = "Type: " + request.FilmDetails[0]
+            Res = "Request: " + request
         });
     }
 }
