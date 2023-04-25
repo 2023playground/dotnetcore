@@ -1,8 +1,8 @@
 public partial class Mutation
 {
-    public Film CreateFilm(AppDbContext db, string? name, string? summary)
+    public Film CreateFilm(AppDbContext db, int filmId, string filmUrl, string filmName, string mediaFileName, bool hasSessions)
     {
-        var film = new Film { Name = name, Summary = summary };
+        var film = new Film { FilmId = filmId, FilmUrl = filmUrl, FilmName = filmName, MediaFileName = mediaFileName, HasSessions = hasSessions };
         db.Films.Add(film);
         db.SaveChanges();
         return film;

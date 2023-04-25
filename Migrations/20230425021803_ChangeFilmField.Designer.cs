@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace dotnet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230425021803_ChangeFilmField")]
+    partial class ChangeFilmField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,28 +32,19 @@ namespace dotnet.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("FilmId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("FilmName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FilmUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("HasSessions")
+                    b.Property<bool?>("HasSessions")
                         .HasColumnType("boolean");
 
                     b.Property<string>("MediaFileName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FilmId")
-                        .IsUnique();
 
                     b.ToTable("Films");
                 });
