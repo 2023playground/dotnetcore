@@ -22,6 +22,12 @@ public class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
         {
             if (oldFilm != null && oldFilm.HasSessions != film.HasSessions)
             {
+                if (oldFilm.HasSessions == false)
+                {
+                    // TODO: Send notification to user
+                    _logger.LogInformation("This film is up: " + film.FilmName);
+                }
+
                 oldFilm.HasSessions = film.HasSessions;
                 _db.SaveChanges();
             }
