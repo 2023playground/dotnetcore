@@ -10,4 +10,13 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Session> Sessions { get; set; }
     public DbSet<FilmSubscription> FilmSubscription { get; set; }
+
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasMany(e => e.FilmList)
+            .WithMany(e => e.UserList)
+            .UsingEntity<FilmSubscription>();
+    }
 }

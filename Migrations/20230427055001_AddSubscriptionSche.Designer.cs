@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace dotnet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230426183931_AddFilmSubscription")]
-    partial class AddFilmSubscription
+    [Migration("20230427055001_AddSubscriptionSche")]
+    partial class AddSubscriptionSche
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,16 +60,23 @@ namespace dotnet.Migrations
 
             modelBuilder.Entity("FilmSubscription", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("FilmId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("UserId", "FilmId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("FilmId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("FilmSubscription");
                 });
@@ -126,6 +133,21 @@ namespace dotnet.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FilmSubscription", b =>
+                {
+                    b.HasOne("Film", null)
+                        .WithMany()
+                        .HasForeignKey("FilmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

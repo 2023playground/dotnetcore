@@ -7,7 +7,7 @@ public partial class Mutation
     {
         var filmSubscription = new FilmSubscription { UserId = userId, FilmId = filmId };
         // Create FilmSubscription if user and film exists
-        if (db.Users.Any(u => u.Id == userId) && db.Films.Any(f => f.FilmId == filmId))
+        if (db.Users.Any(u => u.Id == userId) && db.Films.Any(f => f.Id == filmId))
         {
             try
             {
@@ -17,7 +17,7 @@ public partial class Mutation
             }
             catch (Exception)
             {
-                throw new QueryException(ErrorBuilder.New().SetMessage("Create new film subscription failed. Subscription already exist.").Build());
+                throw new QueryException(ErrorBuilder.New().SetMessage("Error during creating Film Subscription. ").Build());
             }
         }
         throw new QueryException(ErrorBuilder.New().SetMessage("User or Film not found").Build());
@@ -26,7 +26,7 @@ public partial class Mutation
     // Delete Film Subscription
     public bool DeleteFilmSubscription(AppDbContext db, int userId, int filmId)
     {
-        var filmSubscription = db.FilmSubscription.FirstOrDefault(f => f.UserId == userId && f.FilmId == filmId);
+        var filmSubscription = db.FilmSubscription.FirstOrDefault(f => f.UserId == userId && f.Id == filmId);
         if (filmSubscription == null)
         {
             throw new QueryException(ErrorBuilder.New().SetMessage("User or Film not found").Build());
