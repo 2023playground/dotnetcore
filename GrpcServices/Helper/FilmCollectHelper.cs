@@ -1,39 +1,52 @@
+using GrpcDataCollect;
 using GrpcDataCollect.Services;
 using Microsoft.EntityFrameworkCore;
 
 public static class FilmCollectHelper
 {
-    public static void AddToDatabase(ILogger<FilmCollectService> _logger, AppDbContext _db, Film film)
+
+    // Take FilmDetail and check each film
+    // If not exist, add into db
+    // If exist, check HasSessions
+    public static void AddOrUpdateFilms(ILogger<FilmCollectService> _logger, AppDbContext _db, FilmDetailList request)
     {
-        // Void Method to handle incoming Film
-        // Add new Film to database if not exist, else update HasSessions
-        var oldFilm = _db.Films.FirstOrDefault(u => u.FilmCode == film.FilmCode);
-        if (oldFilm != null)
+        for (int i = 0; i < request.FilmDetails.Count; i++)
         {
-            if (oldFilm.HasSessions != film.HasSessions)
+            // Check If film exist in DB
+            var oldFilm = _db.Films.FirstOrDefault(u => u.FilmCode == request.FilmDetails[i].Id);
+            if (oldFilm != null)
             {
-                if (film.HasSessions == true)
+                // If exist, check HasSessions
+                if (oldFilm.HasSessions == false && request.FilmDetails[i].HasSessions == true)
                 {
-                    // TODO: Send notification to user
-                    _logger.LogInformation("This film is up: " + film.FilmName);
+                    // If HasSessions changed from false to true, update HasSessions
+                    _logger.LogInformation("This film is up: " + oldFilm.FilmName);
+                    oldFilm.HasSessions = true;
+                    _db.Entry(oldFilm).State = EntityState.Modified;
                 }
-                oldFilm.HasSessions = film.HasSessions;
-                _db.SaveChanges();
             }
             else
             {
-                // RemoveInProduction
-                _logger.LogInformation("Film not changed");
-            };
+                // Film not exist, add into db
+                var newFilm = new Film
+                {
+                    FilmCode = request.FilmDetails[i].Id,
+                    FilmUrl = request.FilmDetails[i].FilmUrl,
+                    FilmName = request.FilmDetails[i].FilmName,
+                    MediaFileName = request.FilmDetails[i].MediaFileName,
+                    HasSessions = request.FilmDetails[i].HasSessions,
+                    IsActivate = true
+                };
+                _db.Films.Add(newFilm);
+                _logger.LogInformation("New film added: " + newFilm.FilmName);
+            }
         }
-        else
-        {
-            // It's a new film, add in DB
-            Console.WriteLine("New film added: " + film.FilmName);
-            _db.Films.Add(film);
-            _db.SaveChanges();
-        }
+
+        // One save for all changes
+        _db.SaveChanges();
+
     }
+
     public static async Task DeactivateFilmsNotInListAsync(ILogger<FilmCollectService> _logger, AppDbContext _db, List<int> ids)
     {
         var deactivateFilms = await _db.Films

@@ -19,20 +19,7 @@ public class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
         await FilmCollectHelper.DeactivateFilmsNotInListAsync(_logger, _db, request.FilmDetails.Select(f => f.Id).ToList());
 
         // Add new film to database if not exist, else update HasSessions
-        // TODO: Any faster way to do? Try to reduce DB call
-        for (int i = 0; i < request.FilmDetails.Count; i++)
-        {
-            var newFilm = new Film
-            {
-                FilmCode = request.FilmDetails[i].Id,
-                FilmUrl = request.FilmDetails[i].FilmUrl,
-                FilmName = request.FilmDetails[i].FilmName,
-                MediaFileName = request.FilmDetails[i].MediaFileName,
-                HasSessions = request.FilmDetails[i].HasSessions,
-                IsActivate = true
-            };
-            FilmCollectHelper.AddToDatabase(_logger, _db, newFilm);
-        }
+        FilmCollectHelper.AddOrUpdateFilms(_logger, _db, request);
 
         return await Task.FromResult(new SendFilmDetailsRes
         {
