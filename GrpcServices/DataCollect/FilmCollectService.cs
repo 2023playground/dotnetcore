@@ -15,7 +15,7 @@ public class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
     // Change Film to inactive if film in DB but not in request
     public async override Task<SendFilmDetailsRes> FilmDetailsReq(FilmDetailList request, ServerCallContext context)
     {
-        // Deactivate Films not in request
+        // Deactivate Films that not in request
         await FilmCollectHelper.DeactivateFilmsNotInListAsync(_logger, _db, request.FilmDetails.Select(f => f.Id).ToList());
 
         // Add new film to database if not exist, else update HasSessions
@@ -24,7 +24,7 @@ public class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
         {
             var newFilm = new Film
             {
-                FilmId = request.FilmDetails[i].Id,
+                FilmCode = request.FilmDetails[i].Id,
                 FilmUrl = request.FilmDetails[i].FilmUrl,
                 FilmName = request.FilmDetails[i].FilmName,
                 MediaFileName = request.FilmDetails[i].MediaFileName,

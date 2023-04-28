@@ -7,7 +7,7 @@ public static class FilmCollectHelper
     {
         // Void Method to handle incoming Film
         // Add new Film to database if not exist, else update HasSessions
-        var oldFilm = _db.Films.FirstOrDefault(u => u.FilmId == film.FilmId);
+        var oldFilm = _db.Films.FirstOrDefault(u => u.FilmCode == film.FilmCode);
         if (oldFilm != null)
         {
             if (oldFilm.HasSessions != film.HasSessions)
@@ -37,7 +37,7 @@ public static class FilmCollectHelper
     public static async Task DeactivateFilmsNotInListAsync(ILogger<FilmCollectService> _logger, AppDbContext _db, List<int> ids)
     {
         var deactivateFilms = await _db.Films
-        .Where(f => !ids.Contains(f.FilmId)).ToListAsync();
+        .Where(f => !ids.Contains(f.FilmCode)).ToListAsync();
 
         // TODO: Improve performance by using Batch Update
         foreach (var film in deactivateFilms)

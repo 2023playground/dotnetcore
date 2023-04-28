@@ -4,15 +4,15 @@ public partial class Mutation
 {
     public Film CreateFilm(AppDbContext db, int filmId, string filmUrl, string filmName, string mediaFileName, bool hasSessions)
     {
-        var film = new Film { FilmId = filmId, FilmUrl = filmUrl, FilmName = filmName, MediaFileName = mediaFileName, HasSessions = hasSessions };
+        var film = new Film { FilmCode = filmId, FilmUrl = filmUrl, FilmName = filmName, MediaFileName = mediaFileName, HasSessions = hasSessions };
         db.Films.Add(film);
         db.SaveChanges();
         return film;
     }
 
-    public bool DeleteFilmById(AppDbContext db, int filmId)
+    public bool DeleteFilmById(AppDbContext db, int Id)
     {
-        var film = db.Films.FirstOrDefault(f => f.FilmId == filmId);
+        var film = db.Films.FirstOrDefault(f => f.Id == Id);
         if (film == null)
         {
             throw new QueryException(ErrorBuilder.New().SetMessage("Failed to delete film. Film not found").Build());

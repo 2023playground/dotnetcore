@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 #pragma warning disable CS8618
 
-[Index(nameof(FilmId), IsUnique = true)]
+[Index(nameof(FilmCode), IsUnique = true)]
 public class Film
 {
     public int Id { get; set; }
-    public int FilmId { get; set; }
+    public int FilmCode { get; set; }
     public string FilmUrl { get; set; }
     public string FilmName { get; set; }
     public string MediaFileName { get; set; }
