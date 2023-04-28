@@ -13,5 +13,6 @@ public class Film
     public string FilmName { get; set; }
     public string MediaFileName { get; set; }
     public bool HasSessions { get; set; }
+    public bool IsActivate { get; set; }
     public List<User>? UserList { get; } = new();
 }
