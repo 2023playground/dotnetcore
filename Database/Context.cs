@@ -18,5 +18,9 @@ public class AppDbContext : DbContext
             .HasMany(e => e.FilmList)
             .WithMany(e => e.UserList)
             .UsingEntity<FilmSubscription>();
+
+        modelBuilder.Entity<FilmSubscription>()
+            .HasIndex(fs => new { fs.UserId, fs.FilmId })
+            .IsUnique();
     }
 }
