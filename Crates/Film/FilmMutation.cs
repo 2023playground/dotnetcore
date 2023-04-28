@@ -1,3 +1,5 @@
+using HotChocolate.Execution;
+
 public partial class Mutation
 {
     public Film CreateFilm(AppDbContext db, int filmId, string filmUrl, string filmName, string mediaFileName, bool hasSessions)
@@ -13,7 +15,7 @@ public partial class Mutation
         var film = db.Films.FirstOrDefault(f => f.FilmId == filmId);
         if (film == null)
         {
-            return false;
+            throw new QueryException(ErrorBuilder.New().SetMessage("Failed to delete film. Film not found").Build());
         }
         db.Films.Remove(film);
         db.SaveChanges();
@@ -25,7 +27,7 @@ public partial class Mutation
         var films = db.Films.ToList();
         if (films == null)
         {
-            return false;
+            throw new QueryException(ErrorBuilder.New().SetMessage("Failed to delete film. Film not found").Build());
         }
         db.Films.RemoveRange(films);
         db.SaveChanges();
