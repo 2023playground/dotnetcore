@@ -16,6 +16,12 @@ public static class FilmCollectHelper
             var oldFilm = _db.Films.FirstOrDefault(u => u.FilmCode == request.FilmDetails[i].Id);
             if (oldFilm != null)
             {
+                // set activate
+                if (oldFilm.IsActivate == false)
+                {
+                    oldFilm.IsActivate = true;
+                }
+
                 // If exist, check HasSessions
                 if (oldFilm.HasSessions == false && request.FilmDetails[i].HasSessions == true)
                 {
