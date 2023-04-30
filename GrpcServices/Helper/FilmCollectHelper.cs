@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 public static class FilmCollectHelper
 {
-
     // Take FilmDetail and check each film
     // If not exist, add into db
     // If exist, check HasSessions
@@ -16,7 +15,7 @@ public static class FilmCollectHelper
             var oldFilm = _db.Films.FirstOrDefault(u => u.FilmCode == request.FilmDetails[i].Id);
             if (oldFilm != null)
             {
-                // set activate
+                // Flim exist, set activate if not
                 if (oldFilm.IsActivate == false)
                 {
                     oldFilm.IsActivate = true;
@@ -56,11 +55,12 @@ public static class FilmCollectHelper
     public static async Task DeactivateFilmsNotInListAsync(ILogger<FilmCollectService> _logger, AppDbContext _db, List<int> ids)
     {
         var deactivateFilms = await _db.Films
-        .Where(f => !ids.Contains(f.FilmCode)).ToListAsync();
+        .Where(f => !ids.Contains(f.FilmCode) && f.IsActivate == true).ToListAsync();
 
         // TODO: Improve performance by using Batch Update
         foreach (var film in deactivateFilms)
         {
+            // TODO: Log when deactivate film
             film.IsActivate = false;
             film.HasSessions = false;
             Console.WriteLine("Deactivate film: " + film.FilmName);
