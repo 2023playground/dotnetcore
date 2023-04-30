@@ -9,7 +9,7 @@ public class HashUtils
 
         var session = new Session
         {
-            UserId = user.Id,
+            User = user,
             ExpiryDate = expiry,
             Token = token
         };

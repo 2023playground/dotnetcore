@@ -55,6 +55,7 @@ public partial class Mutation
                 ErrorBuilder
                     .New()
                     .SetMessage("User does not have a password, please login via social login")
+                    .SetCode(ErrorCode.RequestError.ToString())
                     .Build()
             );
         }
@@ -63,7 +64,11 @@ public partial class Mutation
         if (PasswordUtils.VerifyPassword(password, user.Password) == false)
         {
             throw new QueryException(
-                ErrorBuilder.New().SetMessage("Password is incorrect").Build()
+                ErrorBuilder
+                    .New()
+                    .SetMessage("Password is incorrect")
+                    .SetCode(ErrorCode.RequestError.ToString())
+                    .Build()
             );
         }
 
@@ -78,14 +83,20 @@ public partial class Mutation
         var session = db.Sessions.FirstOrDefault(s => s.Token == token);
         if (session == null)
         {
-            throw new QueryException(ErrorBuilder.New().SetMessage("Session not found").Build());
+            throw new QueryException(
+                ErrorBuilder
+                    .New()
+                    .SetMessage("Session not found")
+                    .SetCode(ErrorCode.RequestError.ToString())
+                    .Build()
+            );
         }
         db.Sessions.Remove(session);
         db.SaveChanges();
         return session;
     }
 
-    public Session SocialLogin(AppDbContext db, string accessToken)
+    public async Task<Session> SocialLogin(AppDbContext db, string accessToken)
     {
         var handler = new JwtSecurityTokenHandler();
         var auth0User = handler.ReadJwtToken(accessToken);
@@ -93,7 +104,11 @@ public partial class Mutation
         if (auth0User.Subject == null)
         {
             throw new QueryException(
-                ErrorBuilder.New().SetMessage("User not registered via social app:auth0").Build()
+                ErrorBuilder
+                    .New()
+                    .SetMessage("User not registered via social app:auth0")
+                    .SetCode(ErrorCode.RequestError.ToString())
+                    .Build()
             );
         }
 
@@ -106,7 +121,7 @@ public partial class Mutation
             var client = new RestClient(System.Environment.GetEnvironmentVariable("AUTH0_DOMAIN")!);
             var request = new RestRequest("/userinfo", Method.Get);
             request.AddHeader("Authorization", "Bearer " + accessToken);
-            var response = client.Execute(request);
+            var response = await client.ExecuteAsync(request);
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 var json = JObject.Parse(response.Content!);
@@ -137,7 +152,11 @@ public partial class Mutation
             }
 
             throw new QueryException(
-                ErrorBuilder.New().SetMessage("Error getting user info from Auth0").Build()
+                ErrorBuilder
+                    .New()
+                    .SetMessage("Error getting user info from Auth0")
+                    .SetCode(ErrorCode.RequestError.ToString())
+                    .Build()
             );
         }
         else
