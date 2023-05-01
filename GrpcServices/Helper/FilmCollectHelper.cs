@@ -52,10 +52,10 @@ public static class FilmCollectHelper
 
     }
 
-    public static async Task DeactivateFilmsNotInListAsync(ILogger<FilmCollectService> _logger, AppDbContext _db, List<int> ids)
+    public static Boolean DeactivateFilmsNotInListAsync(ILogger<FilmCollectService> _logger, AppDbContext _db, List<int> ids)
     {
-        var deactivateFilms = await _db.Films
-        .Where(f => !ids.Contains(f.FilmCode) && f.IsActivate == true).ToListAsync();
+        var deactivateFilms = _db.Films
+        .Where(f => !ids.Contains(f.FilmCode) && f.IsActivate == true).ToList();
 
         // TODO: Improve performance by using Batch Update
         foreach (var film in deactivateFilms)
@@ -65,6 +65,9 @@ public static class FilmCollectHelper
             film.HasSessions = false;
             Console.WriteLine("Deactivate film: " + film.FilmName);
         }
-        await _db.SaveChangesAsync();
+        _db.SaveChanges();
+
+        // Return true if there is any film deactivated
+        return deactivateFilms.Count() != 0;
     }
 }

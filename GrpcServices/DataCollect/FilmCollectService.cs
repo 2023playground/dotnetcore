@@ -16,14 +16,15 @@ public class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
     public async override Task<SendFilmDetailsRes> FilmDetailsReq(FilmDetailList request, ServerCallContext context)
     {
         // Deactivate Films that not in request
-        await FilmCollectHelper.DeactivateFilmsNotInListAsync(_logger, _db, request.FilmDetails.Select(f => f.Id).ToList());
+        var isDeactivated = FilmCollectHelper.DeactivateFilmsNotInListAsync(_logger, _db, request.FilmDetails.Select(f => f.Id).ToList());
 
         // Add new film to database if not exist, else update HasSessions
         FilmCollectHelper.AddOrUpdateFilms(_logger, _db, request);
 
         return await Task.FromResult(new SendFilmDetailsRes
         {
-            Res = "Request first movie: " + request.FilmDetails[0].FilmName
+            Res = "Request first movie: " + request.FilmDetails[0].FilmName,
+            IsDeactivated = isDeactivated
         });
     }
 }
