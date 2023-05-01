@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Listen(
-        IPAddress.Loopback,
+        IPAddress.Parse("0.0.0.0"),
         int.Parse(port!),
         listenOptions =>
         {
@@ -28,7 +28,7 @@ builder.WebHost.ConfigureKestrel(options =>
     );
 
     options.Listen(
-        IPAddress.Loopback,
+        IPAddress.Parse("0.0.0.0"),
         int.Parse(port!) + 1,
         listenOptions =>
         {
