@@ -1,8 +1,12 @@
 using HotChocolate.Execution;
+using Microsoft.EntityFrameworkCore;
 
 public partial class Query
 {
-    public User RestoreSession(AppDbContext db, [Service] IHttpContextAccessor httpContextAccessor)
+    public Session RestoreSession(
+        AppDbContext db,
+        [Service] IHttpContextAccessor httpContextAccessor
+    )
     {
         if (httpContextAccessor.HttpContext != null)
         {
@@ -14,36 +18,48 @@ public partial class Query
                     var token = auth.ToString().Substring("Bearer ".Length);
                     // find session using token
 
-                    var session = db.Sessions.FirstOrDefault(s => s.Token == token);
+                    var session = db.Sessions
+                        .Include(s => s.User)
+                        .FirstOrDefault(s => s.Token == token);
 
                     if (session != null)
                     {
                         if (session.ExpiryDate < DateTime.Now)
                         {
                             throw new QueryException(
-                                ErrorBuilder.New().SetMessage("Session expired").Build()
+                                ErrorBuilder
+                                    .New()
+                                    .SetMessage("Session expired")
+                                    .SetCode(ErrorCode.RequestError.ToString())
+                                    .Build()
                             );
                         }
 
-                        // find user using session
-                        var user = db.Users.FirstOrDefault(u => u.Id == session.UserId);
-                        if (user != null)
-                        {
-                            return user;
-                        }
-                        throw new QueryException(
-                            ErrorBuilder.New().SetMessage("User not found").Build()
-                        );
+                        return session;
                     }
                     throw new QueryException(
-                        ErrorBuilder.New().SetMessage("Session not found").Build()
+                        ErrorBuilder
+                            .New()
+                            .SetMessage("Session not found")
+                            .SetCode(ErrorCode.RequestError.ToString())
+                            .Build()
                     );
                 }
                 throw new QueryException(
-                    ErrorBuilder.New().SetMessage("Bearer auth header not found").Build()
+                    ErrorBuilder
+                        .New()
+                        .SetMessage("Bearer auth header not found")
+                        .SetCode(ErrorCode.RequestError.ToString())
+                        .Build()
                 );
             }
         }
-        throw new QueryException(ErrorBuilder.New().SetMessage("Header not found").Build());
+        throw new QueryException(
+            ErrorBuilder
+                .New()
+                .SetMessage("Header not found")
+                .SetCode(ErrorCode.RequestError.ToString())
+                .Build()
+        );
     }
 }
