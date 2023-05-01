@@ -21,6 +21,13 @@ public static class FilmCollectHelper
                     oldFilm.IsActivate = true;
                 }
 
+                // If MediaFileName changed, update
+                if (oldFilm.MediaFileName != request.FilmDetails[i].MediaFileName)
+                {
+                    oldFilm.MediaFileName = request.FilmDetails[i].MediaFileName;
+                    _db.Entry(oldFilm).State = EntityState.Modified;
+                }
+
                 // If exist, check HasSessions
                 if (oldFilm.HasSessions == false && request.FilmDetails[i].HasSessions == true)
                 {
