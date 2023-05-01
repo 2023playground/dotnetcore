@@ -23,6 +23,15 @@ builder.WebHost.ConfigureKestrel(options =>
         int.Parse(port!),
         listenOptions =>
         {
+            listenOptions.Protocols = HttpProtocols.Http1;
+        }
+    );
+
+    options.Listen(
+        IPAddress.Parse("0.0.0.0"),
+        int.Parse(port!) + 1,
+        listenOptions =>
+        {
             listenOptions.Protocols = HttpProtocols.Http2;
         }
     );
