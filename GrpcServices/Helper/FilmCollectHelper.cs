@@ -28,7 +28,13 @@ public static class FilmCollectHelper
                 film.MediaFileName = newFilmsMap[film.FilmCode].MediaFileName;
                 film.FilmName = newFilmsMap[film.FilmCode].FilmName;
                 film.IsActivate = true;
+
+                if (!film.HasSessions && newFilmsMap[film.FilmCode].HasSessions)
+                {
+                    // TODO: Notify subscribers if film has sessions
+                }
                 film.HasSessions = newFilmsMap[film.FilmCode].HasSessions;
+
 
                 Console.WriteLine("Update film: " + film.FilmName);
                 // Remove touched film from newFlimsMap
