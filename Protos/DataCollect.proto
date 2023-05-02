@@ -25,4 +25,5 @@ message FilmDetail {
 // The response message containing response
 message SendFilmDetailsRes {
   string res = 1;
+  bool isDeactivated = 2;
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace dotnet.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230425025221_AddUniqueFilmId")]
+    partial class AddUniqueFilmId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +32,7 @@ namespace dotnet.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("FilmCode")
+                    b.Property<int>("FilmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("FilmName")
@@ -43,43 +46,16 @@ namespace dotnet.Migrations
                     b.Property<bool>("HasSessions")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsActivate")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("MediaFileName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FilmCode")
+                    b.HasIndex("FilmId")
                         .IsUnique();
 
                     b.ToTable("Films");
-                });
-
-            modelBuilder.Entity("FilmSubscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("FilmId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FilmId");
-
-                    b.HasIndex("UserId", "FilmId")
-                        .IsUnique();
-
-                    b.ToTable("FilmSubscription");
                 });
 
             modelBuilder.Entity("Session", b =>
@@ -101,8 +77,6 @@ namespace dotnet.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Sessions");
                 });
@@ -137,33 +111,6 @@ namespace dotnet.Migrations
 
                     b.ToTable("Users");
                 });
-
-            modelBuilder.Entity("Session", b =>
-                {
-                    b.HasOne("User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-                
-            modelBuilder.Entity("FilmSubscription", b =>
-                {
-                    b.HasOne("Film", null)
-                        .WithMany()
-                        .HasForeignKey("FilmId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
 #pragma warning restore 612, 618
         }
     }
