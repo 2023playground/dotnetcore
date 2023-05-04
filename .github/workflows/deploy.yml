@@ -1,0 +1,59 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_REGISTRY: 6246965351.azurecr.io
+  AZ_USERNAME: ${{ secrets.AZ_USERNAME }}
+  AZ_PASSWORD: ${{ secrets.AZ_PASSWORD }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "7.0.x"
+
+      - name: Build and test
+        run: dotnet build && dotnet test
+
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.ACR_REGISTRY }}/dotnet-core:latest
+
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v1.1.0
+        with:
+          manifests: |
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: dotnet-core-pod
+            spec:
+              containers:
+                - name: dotnet-core
+                  image: ${{ env.ACR_REGISTRY }}/dotnet-core:latest
+                  ports:
+                    - containerPort: 80
+                    - containerPort: 443
+          images: |
+            ${{ env.ACR_REGISTRY }}/dotnet-core:latest
+          namespace: mynamespace
