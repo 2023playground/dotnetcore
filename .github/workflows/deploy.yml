@@ -7,8 +7,6 @@ on:
 
 env:
   ACR_REGISTRY: 6246965351.azurecr.io
-  AZ_USERNAME: ${{ secrets.AZ_USERNAME }}
-  AZ_PASSWORD: ${{ secrets.AZ_PASSWORD }}
 
 jobs:
   build-and-push:
@@ -56,4 +54,3 @@ jobs:
                     - containerPort: 443
           images: |
             ${{ env.ACR_REGISTRY }}/dotnet-core:latest
-          namespace: mynamespace
