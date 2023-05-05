@@ -8,6 +8,11 @@ on:
 env:
   ACR_REGISTRY: 6246965351.azurecr.io
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
