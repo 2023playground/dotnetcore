@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-push:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -24,6 +24,11 @@ jobs:
           dotnet-version: "7.0.x"
       - name: Build and test
         run: dotnet build && dotnet test
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
