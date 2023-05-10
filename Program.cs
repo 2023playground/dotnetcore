@@ -3,6 +3,7 @@ using GrpcDataCollect.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
 
+
 DotNetEnv.Env.Load();
 var port = "5000";
 try
@@ -37,12 +38,12 @@ builder.WebHost.ConfigureKestrel(options =>
     );
 });
 
+
 builder.Services.AddGrpc();
 
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(System.Environment.GetEnvironmentVariable("DB_HOST"))
 );
-
 builder.Services
     .AddGraphQLServer()
     .RegisterDbContext<AppDbContext>()
@@ -67,6 +68,10 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"Error applying migrations: {ex.Message}");
     }
 }
+
+
+
+app.UseValidateToken();
 
 app.MapGraphQL();
 
