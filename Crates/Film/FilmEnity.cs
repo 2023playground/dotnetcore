@@ -16,5 +16,7 @@ public class Film
     public string MediaFileName { get; set; }
     public bool HasSessions { get; set; }
     public bool IsActivate { get; set; }
+
+    [GraphQLIgnore]
     public List<User>? UserList { get; } = new();
 }

@@ -41,7 +41,6 @@ builder.WebHost.ConfigureKestrel(options =>
     );
 });
 
-
 builder.Services.AddGrpc();
 
 builder.Services.AddDbContext<AppDbContext>(
@@ -55,15 +54,14 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters =
-            new TokenValidationParameters
-            {
-                ValidIssuer = Const.LOCALHOSTURL,
-                ValidAudience = Const.LOCALHOSTURL,
-                ValidateIssuerSigningKey = true,
-                RequireExpirationTime = true,
-                IssuerSigningKey = securityKey
-            };
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = Const.LOCALHOSTURL,
+            ValidAudience = Const.LOCALHOSTURL,
+            ValidateIssuerSigningKey = true,
+            RequireExpirationTime = true,
+            IssuerSigningKey = securityKey
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -75,8 +73,7 @@ builder.Services
     .RegisterDbContext<AppDbContext>()
     .AddMutationType<Mutation>()
     .AddProjections()
-    .AddFiltering()
-;
+    .AddFiltering();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -95,17 +92,11 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-
-
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGraphQL();
 
 app.MapGrpcService<FilmCollectService>();
-
-
-
 
 app.Run();
