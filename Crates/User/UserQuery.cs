@@ -1,63 +1,35 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using HotChocolate.Authorization;
 using HotChocolate.Execution;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 public partial class Query
 {
+    [Authorize]
     public Session RestoreSession(
         AppDbContext db,
-        [Service] IHttpContextAccessor httpContextAccessor
+        ClaimsPrincipal claimsPrincipal
     )
     {
-        if (httpContextAccessor.HttpContext != null)
+        Console.WriteLine("In restore session");
+        Console.WriteLine("Claims principal id: " + claimsPrincipal.FindFirstValue("id"));
+        var strUserId = claimsPrincipal.FindFirstValue("id");
+        int userId;
+        int.TryParse(strUserId, out userId);
+        var user = db.Users.FirstOrDefault(u => u.Id == userId);
+        if (user != null)
         {
-            if (httpContextAccessor.HttpContext.Request.Headers.ContainsKey("Authorization"))
-            {
-                var auth = httpContextAccessor.HttpContext.Request.Headers["Authorization"];
-                if (auth.ToString().StartsWith("Bearer "))
-                {
-                    var token = auth.ToString().Substring("Bearer ".Length);
-                    // find session using token
-
-                    var session = db.Sessions
-                        .Include(s => s.User)
-                        .FirstOrDefault(s => s.Token == token);
-
-                    if (session != null)
-                    {
-                        if (session.ExpiryDate < DateTime.Now)
-                        {
-                            throw new QueryException(
-                                ErrorBuilder
-                                    .New()
-                                    .SetMessage("Session expired")
-                                    .SetCode(ErrorCode.RequestError.ToString())
-                                    .Build()
-                            );
-                        }
-
-                        return session;
-                    }
-                    throw new QueryException(
-                        ErrorBuilder
-                            .New()
-                            .SetMessage("Session not found")
-                            .SetCode(ErrorCode.RequestError.ToString())
-                            .Build()
-                    );
-                }
-                throw new QueryException(
-                    ErrorBuilder
-                        .New()
-                        .SetMessage("Bearer auth header not found")
-                        .SetCode(ErrorCode.RequestError.ToString())
-                        .Build()
-                );
-            }
+            Console.WriteLine("User found in restore session");
+            var session = HashUtils.GenerateJWT(user);
+            return session;
         }
         throw new QueryException(
             ErrorBuilder
                 .New()
-                .SetMessage("Header not found")
+                .SetMessage("User not found")
                 .SetCode(ErrorCode.RequestError.ToString())
                 .Build()
         );

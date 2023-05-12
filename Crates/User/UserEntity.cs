@@ -1,9 +1,9 @@
 #pragma warning disable CS8618
-
-
+using HotChocolate.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 [Index(nameof(Email), IsUnique = true)]
+// [Authorize]
 public class User
 {
     public int Id { get; set; }

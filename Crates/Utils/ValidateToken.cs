@@ -1,4 +1,7 @@
 using System.Net;
+using System.Security.Claims;
+using HotChocolate.Language;
+using Newtonsoft.Json.Linq;
 
 public class ValidateToken
 {
@@ -9,9 +12,38 @@ public class ValidateToken
     }
     public async Task InvokeAsync(HttpContext context)
     {
+        var allowedQueriesAndMutations = new List<string> { "login", "register", "films" };
+
+        // GRPC in whitelist
+        if (context.Request.Path.StartsWithSegments("/dataCollect.SendFilmDetails"))
+        {
+            Console.WriteLine("in GRPC");
+            await _next(context);
+            return;
+        }
+
+
+        // if (context.Request.Path.StartsWithSegments("/graphql"))
+        // {
+        //     Console.WriteLine("in GQL");
+        //     Console.WriteLine("GQL Path: " + context.Request.Path);
+        //     using var streamReader = new StreamReader(context.Request.Body);
+        //     var body = await streamReader.ReadToEndAsync();
+        //     var jObject = JObject.Parse(body);
+        //     var query = jObject["query"]?.ToString()?.ToLowerInvariant();
+
+        //     Console.WriteLine("GQL Body: " + body);
+        //     Console.WriteLine("jObject: " + jObject);
+        //     Console.WriteLine("GQL query: " + query);
+
+
+        //     await _next(context);
+        //     return;
+        // }
+
         // if request is not in whitelist
         Console.WriteLine("in middleware");
-        if (context.Request.Headers.ContainsKey("Authorization"))
+        if (context.Request.Headers.ContainsKey("Authorization") && context.GetType() == typeof(GraphQLRequest))
         {
             Console.WriteLine("Authorization header found");
             var auth = context.Request.Headers["Authorization"];
@@ -30,6 +62,18 @@ public class ValidateToken
                 }
                 // validate token, pass to next
                 Console.WriteLine("token not expired");
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, "John Doe"),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
+
+                var identity = new ClaimsIdentity(claims, "MyAuthType");
+                var principal = new ClaimsPrincipal(identity);
+                context.Items["claims"] = principal;
+                context.User.AddIdentity(identity);
+
                 await _next(context);
                 return;
             }

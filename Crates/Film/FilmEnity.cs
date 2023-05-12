@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using HotChocolate.Authorization;
 
 #pragma warning disable CS8618
 
 [Index(nameof(FilmCode), IsUnique = true)]
+// [Authorize]
 public class Film
 {
     public int Id { get; set; }

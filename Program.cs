@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using GrpcDataCollect.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Net;
-
+using HotChocolate.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 DotNetEnv.Env.Load();
 var port = "5000";
@@ -44,13 +47,36 @@ builder.Services.AddGrpc();
 builder.Services.AddDbContext<AppDbContext>(
     options => options.UseNpgsql(System.Environment.GetEnvironmentVariable("DB_HOST"))
 );
+
+// Authentication
+
+var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Const.SecretKey));
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidIssuer = Const.LOCALHOSTURL,
+                ValidAudience = Const.LOCALHOSTURL,
+                ValidateIssuerSigningKey = true,
+                RequireExpirationTime = true,
+                IssuerSigningKey = securityKey
+            };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services
     .AddGraphQLServer()
-    .RegisterDbContext<AppDbContext>()
+    .AddAuthorization()
     .AddQueryType<Query>()
+    .RegisterDbContext<AppDbContext>()
     .AddMutationType<Mutation>()
     .AddProjections()
-    .AddFiltering();
+    .AddFiltering()
+;
 
 builder.Services.AddHttpContextAccessor();
 
@@ -71,10 +97,15 @@ using (var scope = app.Services.CreateScope())
 
 
 
-app.UseValidateToken();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGraphQL();
 
 app.MapGrpcService<FilmCollectService>();
+
+
+
 
 app.Run();
