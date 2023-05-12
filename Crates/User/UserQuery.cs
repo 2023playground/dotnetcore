@@ -14,15 +14,12 @@ public partial class Query
         ClaimsPrincipal claimsPrincipal
     )
     {
-        Console.WriteLine("In restore session");
-        Console.WriteLine("Claims principal id: " + claimsPrincipal.FindFirstValue("id"));
         var strUserId = claimsPrincipal.FindFirstValue("id");
         int userId;
         int.TryParse(strUserId, out userId);
         var user = db.Users.FirstOrDefault(u => u.Id == userId);
         if (user != null)
         {
-            Console.WriteLine("User found in restore session");
             var session = HashUtils.GenerateJWT(user);
             return session;
         }

@@ -97,7 +97,6 @@ public partial class Mutation
     public async Task<Session> SocialLogin(AppDbContext db, string accessToken)
     {
         //get user
-        Console.WriteLine("In social login");
         var handler = new JwtSecurityTokenHandler();
         var auth0User = handler.ReadJwtToken(accessToken);
 
@@ -158,7 +157,6 @@ public partial class Mutation
         else
         {
             //create a new session
-            Console.WriteLine("User Id is: " + user.Id);
             return HashUtils.GenerateJWT(user);
 
         }
