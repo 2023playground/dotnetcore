@@ -12,5 +12,7 @@ public class User
     public string? LastName { get; set; }
     public string? Password { get; set; }
     public string? Auth0Id { get; set; }
+
+    [GraphQLIgnore]
     public List<Film>? FilmList { get; } = new();
 }
