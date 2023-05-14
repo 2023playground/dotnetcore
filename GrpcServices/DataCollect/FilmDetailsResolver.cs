@@ -32,8 +32,6 @@ public partial class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
                     // TODO: Notify subscribers if film has sessions
                 }
                 film.HasSessions = newFilmsMap[film.FilmCode].HasSessions;
-
-                Console.WriteLine("Update film: " + film.FilmName);
                 // Remove touched film from newFlimsMap
                 newFilmsMap.Remove(film.FilmCode);
             }
@@ -59,7 +57,6 @@ public partial class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
                 oldFilm.IsActivate = true;
                 oldFilm.HasSessions = film.HasSessions;
                 _db.Films.Update(oldFilm);
-                Console.WriteLine("Reactivated film: " + oldFilm.FilmName);
             }
             else
             {
@@ -73,7 +70,6 @@ public partial class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
                     IsActivate = true
                 };
                 _db.Films.Add(newFilm);
-                Console.WriteLine("Added new film " + film.FilmName);
             }
         }
         _db.SaveChanges();

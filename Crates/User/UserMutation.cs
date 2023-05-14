@@ -1,4 +1,5 @@
 using HotChocolate.Execution;
+using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.IdentityModel.Tokens.Jwt;
@@ -71,13 +72,10 @@ public partial class Mutation
                     .Build()
             );
         }
-
-        var session = HashUtils.GetNewSession(user);
-        db.Sessions.Add(session);
-        db.SaveChanges();
-        return session;
+        return HashUtils.GenerateJWT(user);
     }
 
+    //TODO: add logout JWT to DB
     public Session Logout(AppDbContext db, string token)
     {
         var session = db.Sessions.FirstOrDefault(s => s.Token == token);
@@ -98,6 +96,7 @@ public partial class Mutation
 
     public async Task<Session> SocialLogin(AppDbContext db, string accessToken)
     {
+        //get user
         var handler = new JwtSecurityTokenHandler();
         var auth0User = handler.ReadJwtToken(accessToken);
 
@@ -112,7 +111,7 @@ public partial class Mutation
             );
         }
 
-        //get user
+
         var user = db.Users.FirstOrDefault(u => u.Auth0Id == auth0User.Subject);
 
         if (user == null)
@@ -142,12 +141,8 @@ public partial class Mutation
                     db.Users.Add(newUser);
                     db.SaveChanges();
 
-                    //create a new session
-                    var session = HashUtils.GetNewSession(newUser);
-
-                    db.Sessions.Add(session);
-                    db.SaveChanges();
-                    return session;
+                    // Create a new JWT
+                    return HashUtils.GenerateJWT(newUser);
                 }
             }
 
@@ -162,10 +157,8 @@ public partial class Mutation
         else
         {
             //create a new session
-            var session = HashUtils.GetNewSession(user);
-            db.Sessions.Add(session);
-            db.SaveChanges();
-            return session;
+            return HashUtils.GenerateJWT(user);
+
         }
     }
 }
