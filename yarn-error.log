@@ -1,0 +1,36 @@
+Arguments: 
+  /Users/inks/.nvm/versions/node/v18.10.0/bin/node /Users/inks/.yarn/bin/yarn.js add react-native-azure-notificationhub
+
+PATH: 
+  /Users/inks/.rvm/gems/ruby-2.7.6/bin:/Users/inks/.rvm/gems/ruby-2.7.6@global/bin:/Users/inks/.rvm/rubies/ruby-2.7.6/bin:/Users/inks/.yarn/bin:/Users/inks/.config/yarn/global/node_modules/.bin:/Users/inks/.nvm/versions/node/v18.10.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Apple/usr/bin:/Users/inks/.yarn/bin:/Users/inks/.config/yarn/global/node_modules/.bin:/Users/inks/.nvm/versions/node/v18.10.0/bin:/Users/inks/.rvm/bin:/Users/inks/Library/Android/sdk/emulator:/Users/inks/Library/Android/sdk/platform-tools
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.10.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/react-native-azure-notificationhub: Not found
+      at params.callback [as _callback] (/Users/inks/.yarn/lib/cli.js:66145:18)
+      at self.callback (/Users/inks/.yarn/lib/cli.js:140890:22)
+      at Request.emit (node:events:513:28)
+      at Request.<anonymous> (/Users/inks/.yarn/lib/cli.js:141862:10)
+      at Request.emit (node:events:513:28)
+      at IncomingMessage.<anonymous> (/Users/inks/.yarn/lib/cli.js:141784:12)
+      at Object.onceWrapper (node:events:627:28)
+      at IncomingMessage.emit (node:events:525:35)
+      at endReadableNT (node:internal/streams/readable:1359:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

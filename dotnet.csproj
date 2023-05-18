@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Auth0.ManagementApi" Version="7.19.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.14.0" />
     <PackageReference Include="DotNetEnv" Version="2.5.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="13.0.5" />
+    <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
     <Protobuf Include="Protos\DataCollect.proto" GrpcServices="Server" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.52.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.5" />

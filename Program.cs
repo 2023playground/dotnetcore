@@ -76,6 +76,7 @@ builder.Services
     .AddFiltering();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<EmailNotificationHandler>();
 
 var app = builder.Build();
 

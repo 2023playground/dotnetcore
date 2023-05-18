@@ -30,20 +30,29 @@ public partial class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
                 if (!film.HasSessions && newFilmsMap[film.FilmCode].HasSessions)
                 {
                     // TODO: Notify subscribers if film has sessions
+                    var allSubscribersOfFilm = _db.FilmSubscription
+                        .Where(s => s.FilmId == film.FilmCode)
+                        .ToList();
+                    Console.WriteLine("The film has sessions now: " + film.FilmName + ", FilmId:" + film.Id);
+                    Console.WriteLine("All subscribers: " + allSubscribersOfFilm);
+                    foreach (FilmSubscription subscriber in allSubscribersOfFilm)
+                    {
+                        Console.WriteLine("Notify subscriber: " + subscriber.UserId);
+                    }
+                    film.HasSessions = newFilmsMap[film.FilmCode].HasSessions;
+                    // Remove touched film from newFlimsMap
+                    newFilmsMap.Remove(film.FilmCode);
                 }
-                film.HasSessions = newFilmsMap[film.FilmCode].HasSessions;
-                // Remove touched film from newFlimsMap
-                newFilmsMap.Remove(film.FilmCode);
-            }
-            else
-            {
-                containsDeactivated = true;
-                film.IsActivate = false;
-                film.HasSessions = false;
-                _logger.LogInformation("Deactivate film: " + film.FilmName);
-            }
+                else
+                {
+                    containsDeactivated = true;
+                    film.IsActivate = false;
+                    film.HasSessions = false;
+                    _logger.LogInformation("Deactivate film: " + film.FilmName);
+                }
 
-            _db.Entry(film).State = EntityState.Modified;
+                _db.Entry(film).State = EntityState.Modified;
+            }
         });
 
         // Add new film
