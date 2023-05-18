@@ -11,13 +11,14 @@ public partial class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
     )
     {
         var containsDeactivated = false;
+        var handler = new EmailNotificationHandler();
 
         // All activated films
         var activatedFilmList = _db.Films.Where(f => f.IsActivate == true).ToList();
         // New films Map
         var newFilmsMap = request.FilmDetails.ToDictionary(f => f.Id, f => f);
 
-        activatedFilmList.ForEach(film =>
+        activatedFilmList.ForEach(async film =>
         {
             if (newFilmsMap.ContainsKey(film.FilmCode))
             {
@@ -31,14 +32,22 @@ public partial class FilmCollectService : SendFilmDetails.SendFilmDetailsBase
                 {
                     // TODO: Notify subscribers if film has sessions
                     var allSubscribersOfFilm = _db.FilmSubscription
-                        .Where(s => s.FilmId == film.FilmCode)
+                        .Where(s => s.FilmId == film.Id)
                         .ToList();
                     Console.WriteLine("The film has sessions now: " + film.FilmName + ", FilmId:" + film.Id);
-                    Console.WriteLine("All subscribers: " + allSubscribersOfFilm);
-                    foreach (FilmSubscription subscriber in allSubscribersOfFilm)
+                    // Console.WriteLine("All subscribers: " + allSubscribersOfFilm);
+
+                    var userList = new List<User>();
+                    allSubscribersOfFilm.ForEach(subscriber =>
                     {
-                        Console.WriteLine("Notify subscriber: " + subscriber.UserId);
-                    }
+                        var user = _db.Users.FirstOrDefault(u => u.Id == subscriber.UserId);
+                        if (user != null)
+                        {
+                            userList.Add(user);
+                        }
+                    });
+
+                    await handler.SendEmailAsync(film, userList);
                     film.HasSessions = newFilmsMap[film.FilmCode].HasSessions;
                     // Remove touched film from newFlimsMap
                     newFilmsMap.Remove(film.FilmCode);

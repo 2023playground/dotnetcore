@@ -75,9 +75,6 @@ public class EmailNotificationHandler
             await sender.DisposeAsync();
             await client.DisposeAsync();
         }
-
-        // Console.WriteLine("Press any key to end the application");
-        // Console.ReadKey();
     }
 
 }
